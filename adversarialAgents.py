@@ -153,7 +153,7 @@ class AlphaBetaAgent(AdversarialSearchAgent):
         # John = cool kid
         "*** YOUR CODE HERE ***"
         util.raiseNotDefined()
-
+    # Testy cunt
 
 def betterEvaluationFunction(currentGameState):
     """
