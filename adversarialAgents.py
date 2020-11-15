@@ -150,6 +150,7 @@ class AlphaBetaAgent(AdversarialSearchAgent):
         self.evaluationFunction
         """
         #writing a comment
+        #pacman is a bitch
         "*** YOUR CODE HERE ***"
         util.raiseNotDefined()
 
