@@ -164,6 +164,8 @@ def betterEvaluationFunction(currentGameState):
     """
 
     "*** YOUR CODE HERE ***"
+
+    isLouisCool = True
     util.raiseNotDefined()
 
 
