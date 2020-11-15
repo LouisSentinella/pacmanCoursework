@@ -150,6 +150,7 @@ class AlphaBetaAgent(AdversarialSearchAgent):
         self.evaluationFunction
         """
         #John is a punk
+        # Louis = cool kid
         "*** YOUR CODE HERE ***"
         util.raiseNotDefined()
 
