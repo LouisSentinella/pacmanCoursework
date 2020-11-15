@@ -149,9 +149,7 @@ class AlphaBetaAgent(AdversarialSearchAgent):
         Returns the minimax with alpha-beta pruning action using self.depth and
         self.evaluationFunction
         """
-        #writing a comment
-        #pacman is a bitch
-        #i kinda like him tbh
+        #John is a punk
         "*** YOUR CODE HERE ***"
         util.raiseNotDefined()
 
