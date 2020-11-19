@@ -99,7 +99,7 @@ class AdversarialSearchAgent(Agent):
     is another abstract class.
     """
 
-    def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
+    def __init__(self, evalFn='scoreEvaluationFunction', depth='5'):
         self.index = 0 # Pacman is always agent index 0
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
@@ -136,6 +136,7 @@ class MinimaxAgent(AdversarialSearchAgent):
         """
 
         "*** YOUR CODE HERE ***"
+        """
         gameStateList = []
         for i in (gameState.getLegalActions(0)):
             gameStateList.append([i,gameState.generateSuccessor(0, i)])
@@ -165,8 +166,69 @@ class MinimaxAgent(AdversarialSearchAgent):
             return random.choice(gameStateList)[0]
 
         return best[0]
+        """
 
-        #util.raiseNotDefined()
+        gameStateList = []
+
+        for i in (gameState.getLegalActions(0)):
+            gameStateList.append([[i, gameState.generateSuccessor(0, i)],[]])
+
+
+
+        for i in gameStateList:
+            for j in i[0][1].getLegalActions():
+                i[1].append([[j, i[0][1].generateSuccessor(0,j)], []])
+
+        print(gameStateList)
+
+        for i in gameStateList:
+            for j in i[1]:
+                for k in j[0][1].getLegalActions():
+                    j[1].append([[k, j[0][1].generateSuccessor(0, k)], []])
+
+        for i in gameStateList:
+            for j in i[1]:
+                for k in j[1]:
+                    for l in k[0][1].getLegalActions():
+                        k[1].append([[l, k[0][1].generateSuccessor(0, l)], []])
+
+        for i in gameStateList:
+            for j in i[1]:
+                for k in j[1]:
+                    for l in k[1]:
+                        for m in l[0][1].getLegalActions():
+                            l[1].append([[m, l[0][1].generateSuccessor(0, m)], []])
+
+        print(gameStateList)
+        for i in gameStateList:
+            for j in i[1]:
+                for k in j[1]:
+                    for l in k[1]:
+
+                        best = []
+                        bestScore = -10000000000
+
+                        for m in l[1]:
+
+
+                            if m[0][1].getScore() > bestScore:
+                                best = m[0]
+                                bestScore = m[0][1].getScore()
+
+                        l[1]  = [best, bestScore]
+
+
+                print(k)
+        print(gameStateList)
+
+
+
+
+
+
+
+
+        util.raiseNotDefined()
 
 
 class AlphaBetaAgent(AdversarialSearchAgent):
