@@ -140,166 +140,44 @@ class MinimaxAgent(AdversarialSearchAgent):
         gameStateList = []
 
         for i in (gameState.getLegalActions(0)):
-            gameStateList.append([[i, gameState.generateSuccessor(0, i)],[]])
-
-
+            gameStateList.append([[i, gameState.generateSuccessor(0, i)], []])
 
         for i in gameStateList:
-            for j in i[0][1].getLegalActions():
-                i[1].append([[j, i[0][1].generateSuccessor(0,j)], []])
+            print(self.expandNode(i, depth=0))
 
-        #print(gameStateList)
+        print("You did it baby")
 
-        for i in gameStateList:
-            for j in i[1]:
-                for k in j[0][1].getLegalActions():
-                    j[1].append([[k, j[0][1].generateSuccessor(0, k)], []])
-
-        for i in gameStateList:
-            for j in i[1]:
-                for k in j[1]:
-                    for l in k[0][1].getLegalActions():
-                        k[1].append([[l, k[0][1].generateSuccessor(0, l)], []])
-
-        for i in gameStateList:
-            for j in i[1]:
-                for k in j[1]:
-                    for l in k[1]:
-                        for m in l[0][1].getLegalActions():
-                            l[1].append([[m, l[0][1].generateSuccessor(0, m)], []])
-
-        for i in gameStateList:
-            for j in i[1]:
-                for k in j[1]:
-                    for l in k[1]:
-                        for m in l[1]:
-                            for n in m[0][1].getLegalActions():
-                                m[1].append([[n, m[0][1].generateSuccessor(0, n)], []])
-
-        for i in gameStateList:
-            for j in i[1]:
-                for k in j[1]:
-                    for l in k[1]:
-                        for m in l[1]:
-                            for n in m[1]:
-                                for o in n[0][1].getLegalActions():
-
-                                    n[1].append([[o, n[0][1].generateSuccessor(0, o)], []])
-
-        for i in gameStateList:
-            for j in i[1]:
-                for k in j[1]:
-                    for l in k[1]:
-                        for m in l[1]:
-                            for n in m[1]:
-                                for o in n[1]:
-                                    for p in o[0][1].getLegalActions():
-
-                                        o[1].append([[p,o[0][1].generateSuccessor(0, p)], []])
-
-        #print(gameStateList)
-
-        bestI = []
-        bestIScore = -100000000000
+        #return bestI
 
 
-        for i in gameStateList:
+        for i in range(self.depth):
 
-            worstJ = []
-            worstJScore = 100000000000
 
-            for j in i[1]:
-                bestK = []
-                bestKScore = -100000000000
 
-                for k in j[1]:
 
-                    worst = []
-                    worstL = 10000000000
 
-                    for l in k[1]:
 
-                        best = []
-                        bestScore = -10000000000
 
-                        for m in l[1]:
 
-                            worstN = []
-                            worstNScore = 1000000000000000
 
-                            for n in m[1]:
 
-                                bestO = []
-                                bestOScore = -100000000000
 
-                                for o in n[1]:
 
-                                    worstP = []
-                                    worstPScore = 100000000000
 
-                                    for p in o[1]:
-                                        if p[0][1].getScore() < worstPScore:
-                                            worstP = p[0]
-                                            worstPScore = p[0][1].getScore()
 
-                                    o[1] = [worstP, worstPScore]
 
-                                    if o[1][1] > bestOScore:
-                                        bestO = o[1][0]
-                                        bestOScore = o[1][1]
+    def expandNode(self, nodeToBeExanded, depth):
 
-                                n[1] = [bestO, bestOScore]
+        for i in nodeToBeExanded[0][1].getLegalActions():
+            nodeToBeExanded[1].append([[i, nodeToBeExanded[0][1].generateSuccessor(0, i)], []])
 
-                                if n[1][1] < worstNScore:
-                                    worstN = n[1][0]
-                                    worstNScore = n[1][1]
+        depth += 1
+        if depth != self.depth - 1:
+            for i in nodeToBeExanded[1]:
+                self.expandNode(i, depth)
+        else:
+            return nodeToBeExanded
 
-                            m[1] = [worstN, worstNScore]
-
-                            if m[1][1] > bestScore:
-                                best = m[1][0]
-                                bestScore = m[1][1]
-
-                        l[1]  = [best, bestScore]
-
-                        if l[1][1] < worstL:
-                            worst = l[1][0]
-                            worstL = l[1][1]
-                    k[1] = [worst, worstL]
-
-                    if k[1][1] > bestKScore:
-                        bestK = k[1][0]
-                        bestKScore = k[1][1]
-
-                j[1] = [bestK, bestKScore]
-
-                if j[1][1] < worstJScore:
-                    worstJ = j[1][0]
-                    worstJScore = j[1][1]
-
-            i[1] = [worstJ, worstJScore]
-
-            if i[1][1] > bestIScore:
-                bestI = i[0][0]
-                bestIScore = i[1][1]
-
-        """
-        if gameStateList[0][1][1] == gameStateList[1][1][1]:
-            if gameStateList[1][1][1] == gameStateList[2][1][1]:
-                randomChoice = "Stop"
-                while randomChoice == "Stop":
-                    randomChoice = random.choice(gameStateList)[0][0]
-
-                return randomChoice
-        
-        if bestI == "Stop":
-            randomChoice = "Stop"
-            while randomChoice == "Stop":
-                randomChoice = random.choice(gameStateList)[0][0]
-
-            return randomChoice
-        """
-        return bestI
 
 
 
@@ -332,5 +210,7 @@ def betterEvaluationFunction(currentGameState):
 
     isLouisCool = True
     util.raiseNotDefined()
+
+
 
 
