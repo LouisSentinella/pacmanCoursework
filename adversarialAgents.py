@@ -244,171 +244,64 @@ class MinimaxAgent(AdversarialSearchAgent):
 
                                     o[1] = [worstP, worstPScore]
 
-                                    if o[0][1].getScore() > bestOScore:
-                                        bestO = o[0]
-                                        bestOScore = o[0][1].getScore()
+                                    if o[1][1] > bestOScore:
+                                        bestO = o[1][0]
+                                        bestOScore = o[1][1]
 
                                 n[1] = [bestO, bestOScore]
 
-                                if n[0][1].getScore() < worstNScore:
-                                    worstN = n[0]
-                                    worstNScore = n[0][1].getScore()
+                                if n[1][1] < worstNScore:
+                                    worstN = n[1][0]
+                                    worstNScore = n[1][1]
 
                             m[1] = [worstN, worstNScore]
 
-                            if m[0][1].getScore() > bestScore:
-                                best = m[0]
-                                bestScore = m[0][1].getScore()
+                            if m[1][1] > bestScore:
+                                best = m[1][0]
+                                bestScore = m[1][1]
 
                         l[1]  = [best, bestScore]
 
-                        if l[0][1].getScore() < worstL:
-                            worst = l[0]
-                            worstL = l[0][1].getScore()
+                        if l[1][1] < worstL:
+                            worst = l[1][0]
+                            worstL = l[1][1]
                     k[1] = [worst, worstL]
 
-                    if k[0][1].getScore() > bestKScore:
-                        bestK = k[0]
-                        bestKScore = k[0][1].getScore()
+                    if k[1][1] > bestKScore:
+                        bestK = k[1][0]
+                        bestKScore = k[1][1]
 
                 j[1] = [bestK, bestKScore]
 
-                if j[0][1].getScore() < worstJScore:
-                    worstJ = j[0]
-                    worstJScore = j[0][1].getScore()
+                if j[1][1] < worstJScore:
+                    worstJ = j[1][0]
+                    worstJScore = j[1][1]
 
             i[1] = [worstJ, worstJScore]
 
-            if i[0][1].getScore() > bestIScore:
-                bestI = i[0]
-                bestIScore = i[0][1].getScore()
+            if i[1][1] > bestIScore:
+                bestI = i[0][0]
+                bestIScore = i[1][1]
 
-        if bestI[0] == "Stop":
-            return(random.choice(gameStateList)[0][0])
-        return bestI[0]
-
-
-class MaxAgent(AdversarialSearchAgent):
-    """
-    Your minimax agent (question 1)
-    """
-
-    def getAction(self, gameState):
         """
-        Returns the minimax action from the current gameState using self.depth
-        and self.evaluationFunction.
+        if gameStateList[0][1][1] == gameStateList[1][1][1]:
+            if gameStateList[1][1][1] == gameStateList[2][1][1]:
+                randomChoice = "Stop"
+                while randomChoice == "Stop":
+                    randomChoice = random.choice(gameStateList)[0][0]
 
-        Here are some method calls that might be useful when implementing
-        minimax.
+                return randomChoice
+        
+        if bestI == "Stop":
+            randomChoice = "Stop"
+            while randomChoice == "Stop":
+                randomChoice = random.choice(gameStateList)[0][0]
 
-        gameState.getLegalActions(agentIndex):
-        Returns a list of legal actions for an agent
-        agentIndex=0 means Pacman, ghosts are >= 1
-
-        gameState.generateSuccessor(agentIndex, action):
-        Returns the successor game state after an agent takes an action
-
-        gameState.getNumAgents():
-        Returns the total number of agents in the game
-
-        gameState.isWin():
-        Returns whether or not the game state is a winning state
-
-        gameState.isLose():
-        Returns whether or not the game state is a losing state
+            return randomChoice
         """
-
-        "*** YOUR CODE HERE ***"
-
-        gameStateList = []
-
-        for i in (gameState.getLegalActions(0)):
-            gameStateList.append([[i, gameState.generateSuccessor(0, i)],[]])
+        return bestI
 
 
-
-        for i in gameStateList:
-            for j in i[0][1].getLegalActions():
-                i[1].append([[j, i[0][1].generateSuccessor(0,j)], []])
-
-        #print(gameStateList)
-
-        for i in gameStateList:
-            for j in i[1]:
-                for k in j[0][1].getLegalActions():
-                    j[1].append([[k, j[0][1].generateSuccessor(0, k)], []])
-
-        for i in gameStateList:
-            for j in i[1]:
-                for k in j[1]:
-                    for l in k[0][1].getLegalActions():
-                        k[1].append([[l, k[0][1].generateSuccessor(0, l)], []])
-
-        for i in gameStateList:
-            for j in i[1]:
-                for k in j[1]:
-                    for l in k[1]:
-                        for m in l[0][1].getLegalActions():
-                            l[1].append([[m, l[0][1].generateSuccessor(0, m)], []])
-
-        #print(gameStateList)
-
-        bestI = []
-        bestIScore = -100000000000
-
-
-        for i in gameStateList:
-
-            bestJ = []
-            bestJScore = -100000000000
-
-            for j in i[1]:
-                bestK = []
-                bestKScore = -100000000000
-
-                for k in j[1]:
-
-                    bestL = []
-                    bestLScore = -10000000000
-
-                    for l in k[1]:
-
-                        best = []
-                        bestScore = -10000000000
-
-                        for m in l[1]:
-
-
-                            if m[0][1].getScore() > bestScore:
-                                best = m[0]
-                                bestScore = m[0][1].getScore()
-
-                        l[1]  = [best, bestScore]
-
-                        if l[0][1].getScore() > bestLScore:
-                            bestL = l[0]
-                            bestLScore = l[0][1].getScore()
-                    k[1] = [bestL, bestLScore]
-
-                    if k[0][1].getScore() > bestKScore:
-                        bestK = k[0]
-                        bestKScore = k[0][1].getScore()
-
-                j[1] = [bestK, bestKScore]
-
-                if j[0][1].getScore() > bestJScore:
-                    bestJ = j[0]
-                    bestJScore = j[0][1].getScore()
-
-            i[1] = [bestJ, bestJScore]
-
-            if i[0][1].getScore() > bestIScore:
-                bestI = i[0]
-                bestIScore = i[0][1].getScore()
-
-        if bestI[0] == "Stop":
-            return(random.choice(gameStateList)[0][0])
-        return bestI[0]
 
 
 class AlphaBetaAgent(AdversarialSearchAgent):
