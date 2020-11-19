@@ -136,37 +136,6 @@ class MinimaxAgent(AdversarialSearchAgent):
         """
 
         "*** YOUR CODE HERE ***"
-        """
-        gameStateList = []
-        for i in (gameState.getLegalActions(0)):
-            gameStateList.append([i,gameState.generateSuccessor(0, i)])
-            print(i)
-        best = []
-        bestScore = -10000000000
-        for i in gameStateList:
-            if i[1].getScore() > bestScore:
-                best = i
-                bestScore = i[1].getScore()
-
-        for i in gameStateList:
-            for j in (i[1].getLegalActions(0)):
-                i.append([j, i[1].generateSuccessor(0, j)])
-        best = None
-        bestScore = -10000000000
-
-        for i in gameStateList:
-            for j in range(2, len(i) -1):
-                if i[j][1].getScore() > bestScore:
-                    best = i
-                    bestScore = i[2][1].getScore()
-
-        if bestScore == -10000000000:
-            return random.choice(gameStateList)[0]
-        elif best[0] == "Stop":
-            return random.choice(gameStateList)[0]
-
-        return best[0]
-        """
 
         gameStateList = []
 
@@ -179,7 +148,7 @@ class MinimaxAgent(AdversarialSearchAgent):
             for j in i[0][1].getLegalActions():
                 i[1].append([[j, i[0][1].generateSuccessor(0,j)], []])
 
-        print(gameStateList)
+        #print(gameStateList)
 
         for i in gameStateList:
             for j in i[1]:
@@ -199,10 +168,209 @@ class MinimaxAgent(AdversarialSearchAgent):
                         for m in l[0][1].getLegalActions():
                             l[1].append([[m, l[0][1].generateSuccessor(0, m)], []])
 
-        print(gameStateList)
         for i in gameStateList:
             for j in i[1]:
                 for k in j[1]:
+                    for l in k[1]:
+                        for m in l[1]:
+                            for n in m[0][1].getLegalActions():
+                                m[1].append([[n, m[0][1].generateSuccessor(0, n)], []])
+
+        for i in gameStateList:
+            for j in i[1]:
+                for k in j[1]:
+                    for l in k[1]:
+                        for m in l[1]:
+                            for n in m[1]:
+                                for o in n[0][1].getLegalActions():
+
+                                    n[1].append([[o, n[0][1].generateSuccessor(0, o)], []])
+
+        for i in gameStateList:
+            for j in i[1]:
+                for k in j[1]:
+                    for l in k[1]:
+                        for m in l[1]:
+                            for n in m[1]:
+                                for o in n[1]:
+                                    for p in o[0][1].getLegalActions():
+
+                                        o[1].append([[p,o[0][1].generateSuccessor(0, p)], []])
+
+        #print(gameStateList)
+
+        bestI = []
+        bestIScore = -100000000000
+
+
+        for i in gameStateList:
+
+            worstJ = []
+            worstJScore = 100000000000
+
+            for j in i[1]:
+                bestK = []
+                bestKScore = -100000000000
+
+                for k in j[1]:
+
+                    worst = []
+                    worstL = 10000000000
+
+                    for l in k[1]:
+
+                        best = []
+                        bestScore = -10000000000
+
+                        for m in l[1]:
+
+                            worstN = []
+                            worstNScore = 1000000000000000
+
+                            for n in m[1]:
+
+                                bestO = []
+                                bestOScore = -100000000000
+
+                                for o in n[1]:
+
+                                    worstP = []
+                                    worstPScore = 100000000000
+
+                                    for p in o[1]:
+                                        if p[0][1].getScore() < worstPScore:
+                                            worstP = p[0]
+                                            worstPScore = p[0][1].getScore()
+
+                                    o[1] = [worstP, worstPScore]
+
+                                    if o[0][1].getScore() > bestOScore:
+                                        bestO = o[0]
+                                        bestOScore = o[0][1].getScore()
+
+                                n[1] = [bestO, bestOScore]
+
+                                if n[0][1].getScore() < worstNScore:
+                                    worstN = n[0]
+                                    worstNScore = n[0][1].getScore()
+
+                            m[1] = [worstN, worstNScore]
+
+                            if m[0][1].getScore() > bestScore:
+                                best = m[0]
+                                bestScore = m[0][1].getScore()
+
+                        l[1]  = [best, bestScore]
+
+                        if l[0][1].getScore() < worstL:
+                            worst = l[0]
+                            worstL = l[0][1].getScore()
+                    k[1] = [worst, worstL]
+
+                    if k[0][1].getScore() > bestKScore:
+                        bestK = k[0]
+                        bestKScore = k[0][1].getScore()
+
+                j[1] = [bestK, bestKScore]
+
+                if j[0][1].getScore() < worstJScore:
+                    worstJ = j[0]
+                    worstJScore = j[0][1].getScore()
+
+            i[1] = [worstJ, worstJScore]
+
+            if i[0][1].getScore() > bestIScore:
+                bestI = i[0]
+                bestIScore = i[0][1].getScore()
+
+        if bestI[0] == "Stop":
+            return(random.choice(gameStateList)[0][0])
+        return bestI[0]
+
+
+class MaxAgent(AdversarialSearchAgent):
+    """
+    Your minimax agent (question 1)
+    """
+
+    def getAction(self, gameState):
+        """
+        Returns the minimax action from the current gameState using self.depth
+        and self.evaluationFunction.
+
+        Here are some method calls that might be useful when implementing
+        minimax.
+
+        gameState.getLegalActions(agentIndex):
+        Returns a list of legal actions for an agent
+        agentIndex=0 means Pacman, ghosts are >= 1
+
+        gameState.generateSuccessor(agentIndex, action):
+        Returns the successor game state after an agent takes an action
+
+        gameState.getNumAgents():
+        Returns the total number of agents in the game
+
+        gameState.isWin():
+        Returns whether or not the game state is a winning state
+
+        gameState.isLose():
+        Returns whether or not the game state is a losing state
+        """
+
+        "*** YOUR CODE HERE ***"
+
+        gameStateList = []
+
+        for i in (gameState.getLegalActions(0)):
+            gameStateList.append([[i, gameState.generateSuccessor(0, i)],[]])
+
+
+
+        for i in gameStateList:
+            for j in i[0][1].getLegalActions():
+                i[1].append([[j, i[0][1].generateSuccessor(0,j)], []])
+
+        #print(gameStateList)
+
+        for i in gameStateList:
+            for j in i[1]:
+                for k in j[0][1].getLegalActions():
+                    j[1].append([[k, j[0][1].generateSuccessor(0, k)], []])
+
+        for i in gameStateList:
+            for j in i[1]:
+                for k in j[1]:
+                    for l in k[0][1].getLegalActions():
+                        k[1].append([[l, k[0][1].generateSuccessor(0, l)], []])
+
+        for i in gameStateList:
+            for j in i[1]:
+                for k in j[1]:
+                    for l in k[1]:
+                        for m in l[0][1].getLegalActions():
+                            l[1].append([[m, l[0][1].generateSuccessor(0, m)], []])
+
+        #print(gameStateList)
+
+        bestI = []
+        bestIScore = -100000000000
+
+
+        for i in gameStateList:
+
+            bestJ = []
+            bestJScore = -100000000000
+
+            for j in i[1]:
+                bestK = []
+                bestKScore = -100000000000
+
+                for k in j[1]:
+
+                    bestL = []
+                    bestLScore = -10000000000
+
                     for l in k[1]:
 
                         best = []
@@ -217,18 +385,30 @@ class MinimaxAgent(AdversarialSearchAgent):
 
                         l[1]  = [best, bestScore]
 
+                        if l[0][1].getScore() > bestLScore:
+                            bestL = l[0]
+                            bestLScore = l[0][1].getScore()
+                    k[1] = [bestL, bestLScore]
 
-                print(k)
-        print(gameStateList)
+                    if k[0][1].getScore() > bestKScore:
+                        bestK = k[0]
+                        bestKScore = k[0][1].getScore()
 
+                j[1] = [bestK, bestKScore]
 
+                if j[0][1].getScore() > bestJScore:
+                    bestJ = j[0]
+                    bestJScore = j[0][1].getScore()
 
+            i[1] = [bestJ, bestJScore]
 
+            if i[0][1].getScore() > bestIScore:
+                bestI = i[0]
+                bestIScore = i[0][1].getScore()
 
-
-
-
-        util.raiseNotDefined()
+        if bestI[0] == "Stop":
+            return(random.choice(gameStateList)[0][0])
+        return bestI[0]
 
 
 class AlphaBetaAgent(AdversarialSearchAgent):
