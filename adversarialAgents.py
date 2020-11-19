@@ -136,7 +136,37 @@ class MinimaxAgent(AdversarialSearchAgent):
         """
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        gameStateList = []
+        for i in (gameState.getLegalActions(0)):
+            gameStateList.append([i,gameState.generateSuccessor(0, i)])
+            print(i)
+        best = []
+        bestScore = -10000000000
+        for i in gameStateList:
+            if i[1].getScore() > bestScore:
+                best = i
+                bestScore = i[1].getScore()
+
+        for i in gameStateList:
+            for j in (i[1].getLegalActions(0)):
+                i.append([j, i[1].generateSuccessor(0, j)])
+        best = None
+        bestScore = -10000000000
+
+        for i in gameStateList:
+            for j in range(2, len(i) -1):
+                if i[j][1].getScore() > bestScore:
+                    best = i
+                    bestScore = i[2][1].getScore()
+
+        if bestScore == -10000000000:
+            return random.choice(gameStateList)[0]
+        elif best[0] == "Stop":
+            return random.choice(gameStateList)[0]
+
+        return best[0]
+
+        #util.raiseNotDefined()
 
 
 class AlphaBetaAgent(AdversarialSearchAgent):
