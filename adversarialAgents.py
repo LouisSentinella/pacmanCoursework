@@ -99,7 +99,7 @@ class AdversarialSearchAgent(Agent):
     is another abstract class.
     """
 
-    def __init__(self, evalFn='scoreEvaluationFunction', depth='5'):
+    def __init__(self, evalFn='scoreEvaluationFunction', depth='4'):
         self.index = 0 # Pacman is always agent index 0
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
@@ -143,35 +143,136 @@ class MinimaxAgent(AdversarialSearchAgent):
             gameStateList.append([[i, gameState.generateSuccessor(0, i)], []])
 
         for i in gameStateList:
-            print(self.expandNode(i, depth=0))
+            i = self.expandNode(i, 0)
 
-        print("You did it baby")
+        #print("You did it baby")
 
         #return bestI
+        bestScore = -100000000000000
+        bestMove = ""
+        resultsList = []
+        bestResultsList = []
+
+        for i in gameStateList:
+            result = self.miniMax(i, 0)
+            resultsList.append([i[0][0], result])
+            if result[0] != None:
+                if result[1] > bestScore and not result[0].isLose():
+                    if i[0][0] == "Stop":
+                        pass
+                    else:
+                        bestMove = i[0][0]
+                        bestScore = result[1]
+
+        for i in resultsList:
+            if i[1][1] == bestScore and i[0] != "Stop" and not i[1][0].isLose():
+                bestResultsList.append(i[0])
+
+        if len(bestResultsList) > 1:
+            return random.choice(bestResultsList)
+
+        #print(bestMove)
+        '''
+        for i in gameStateList:
+            result = self.miniMax(i, 0)
+            if result[1] > bestScore and not result[0].isLose():
+                bestMove = i[0][0]
+                bestScore = result[1]
+        '''
+        if bestMove == "":
+            return random.choice(gameState.getLegalActions(0))
+        return bestMove
 
 
-        for i in range(self.depth):
 
 
 
 
+    def miniMax(self, node, depth):
 
+        if depth == self.depth - 1:
+            return [node[0][1], node[0][1].getScore()]
 
+        elif depth % 2 == 0:
+            maxScore = -10000000000000
+            maxList = []
+            maxNode = None
+            for i in node[1]:
+                maxList.append(self.miniMax(i, depth+1))
 
+            for i in maxList:
+                if i[0] != None and i[0].isWin():
+                    maxNode = i[0]
+                    maxScore = 1000000000
+                    break
+                elif i[0] == []:
+                    pass
+                elif i[1] > maxScore:
+                    maxScore = i[1]
+                    maxNode = i[0]
 
+            if maxScore ==-10000000000000:
+                pass
 
+            return [maxNode, maxScore]
+        else:
+            minScore = 10000000000000
+            minList = []
+            minNode = None
+            for i in node[1]:
+                minList.append(self.miniMax(i, depth+1))
+            for i in minList:
+                if i[0] != None and i[0].isLose():
+                    maxNode = i[0]
+                    maxScore = -1000000000
+                    break
+                elif i[0] == []:
+                    pass
+                elif i[1] < minScore:
+                    minScore = i[1]
+                    minNode = i[0]
 
+            if minScore == 10000000000000:
+                pass
 
+            return [minNode, minScore]
+
+    def maxMax(self, node, depth):
+
+        if depth == self.depth - 1:
+            return [node[0][1], node[0][1].getScore()]
+
+            maxScore = -10000000000000
+            maxList = []
+            maxNode = None
+            for i in node[1]:
+                maxList.append(self.miniMax(i, depth+1))
+
+            for i in maxList:
+                if i[0] != None and i[0].isWin():
+                    maxNode = i[0]
+                    maxScore = 1000000000
+                    break
+                elif i[0] == []:
+                    pass
+                elif i[1] > maxScore:
+                    maxScore = i[1]
+                    maxNode = i[0]
+
+            if maxScore ==-10000000000000:
+                pass
+
+            return [maxNode, maxScore]
 
 
 
 
     def expandNode(self, nodeToBeExanded, depth):
-
+        depth += 1
         for i in nodeToBeExanded[0][1].getLegalActions():
             nodeToBeExanded[1].append([[i, nodeToBeExanded[0][1].generateSuccessor(0, i)], []])
 
-        depth += 1
+
         if depth != self.depth - 1:
             for i in nodeToBeExanded[1]:
                 self.expandNode(i, depth)
