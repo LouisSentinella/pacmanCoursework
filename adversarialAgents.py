@@ -154,7 +154,7 @@ class MinimaxAgent(AdversarialSearchAgent):
         bestResultsList = []
 
         for i in gameStateList:
-            result = self.miniMax(i, 0)
+            result = self.miniMax(i, self.depth)
             resultsList.append([i[0][0], result])
             if result[0] != None:
                 if result[1] > bestScore and not result[0].isLose():
@@ -163,6 +163,7 @@ class MinimaxAgent(AdversarialSearchAgent):
                     else:
                         bestMove = i[0][0]
                         bestScore = result[1]
+
 
         for i in resultsList:
             if i[1][1] == bestScore and i[0] != "Stop" and not i[1][0].isLose():
@@ -189,8 +190,9 @@ class MinimaxAgent(AdversarialSearchAgent):
 
 
     def miniMax(self, node, depth):
-
-        if depth == self.depth - 1:
+        if node[0][1] != None and node[0][1].isWin():
+            return [node[0][1], 1000000]
+        elif depth == 0:
             return [node[0][1], node[0][1].getScore()]
 
         elif depth % 2 == 0:
@@ -198,7 +200,7 @@ class MinimaxAgent(AdversarialSearchAgent):
             maxList = []
             maxNode = None
             for i in node[1]:
-                maxList.append(self.miniMax(i, depth+1))
+                maxList.append(self.miniMax(i, depth - 1))
 
             for i in maxList:
                 if i[0] != None and i[0].isWin():
@@ -211,7 +213,7 @@ class MinimaxAgent(AdversarialSearchAgent):
                     maxScore = i[1]
                     maxNode = i[0]
 
-            if maxScore ==-10000000000000:
+            if maxScore == -10000000000000:
                 pass
 
             return [maxNode, maxScore]
@@ -220,7 +222,7 @@ class MinimaxAgent(AdversarialSearchAgent):
             minList = []
             minNode = None
             for i in node[1]:
-                minList.append(self.miniMax(i, depth+1))
+                minList.append(self.miniMax(i, depth - 1))
             for i in minList:
                 if i[0] != None and i[0].isLose():
                     maxNode = i[0]
@@ -239,14 +241,16 @@ class MinimaxAgent(AdversarialSearchAgent):
 
     def maxMax(self, node, depth):
 
-        if depth == self.depth - 1:
+        if node[0][1] != None and node[0][1].isWin():
+            return [node[0][1], 1000000]
+        elif depth == 0:
             return [node[0][1], node[0][1].getScore()]
-
+        else:
             maxScore = -10000000000000
             maxList = []
             maxNode = None
             for i in node[1]:
-                maxList.append(self.miniMax(i, depth+1))
+                maxList.append(self.miniMax(i, depth - 1))
 
             for i in maxList:
                 if i[0] != None and i[0].isWin():
@@ -259,12 +263,11 @@ class MinimaxAgent(AdversarialSearchAgent):
                     maxScore = i[1]
                     maxNode = i[0]
 
-            if maxScore ==-10000000000000:
+            if maxScore == -10000000000000:
                 pass
 
             return [maxNode, maxScore]
-
-
+    #############################################
 
 
     def expandNode(self, nodeToBeExanded, depth):
@@ -273,7 +276,7 @@ class MinimaxAgent(AdversarialSearchAgent):
             nodeToBeExanded[1].append([[i, nodeToBeExanded[0][1].generateSuccessor(0, i)], []])
 
 
-        if depth != self.depth - 1:
+        if depth != self.depth:
             for i in nodeToBeExanded[1]:
                 self.expandNode(i, depth)
         else:
