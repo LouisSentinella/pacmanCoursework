@@ -99,7 +99,7 @@ class AdversarialSearchAgent(Agent):
     is another abstract class.
     """
 
-    def __init__(self, evalFn='scoreEvaluationFunction', depth='4'):
+    def __init__(self, evalFn='scoreEvaluationFunction', depth='3'):
         self.index = 0 # Pacman is always agent index 0
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
@@ -190,12 +190,14 @@ class MinimaxAgent(AdversarialSearchAgent):
 
 
     def miniMax(self, node, depth):
+        # The autograder has multiple mins in a row for multiple ghosts
+        numAgents = node[0][1].getNumAgents()
         if node[0][1] != None and node[0][1].isWin():
             return [node[0][1], 1000000]
         elif depth == 0:
             return [node[0][1], node[0][1].getScore()]
 
-        elif depth % 2 == 0:
+        elif depth % numAgents == 0:
             maxScore = -10000000000000
             maxList = []
             maxNode = None
