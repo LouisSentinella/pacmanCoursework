@@ -99,7 +99,7 @@ class AdversarialSearchAgent(Agent):
     is another abstract class.
     """
 
-    def __init__(self, evalFn='scoreEvaluationFunction', depth='3'):
+    def __init__(self, evalFn='scoreEvaluationFunction', depth='4'):
         self.index = 0 # Pacman is always agent index 0
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
@@ -190,11 +190,87 @@ class MinimaxAgent(AdversarialSearchAgent):
 
 
     def miniMax(self, node, depth):
+
+        minmaxlist = ["Min", "Min", "Max"] * ((self.depth % 3) + 1)
+        if node[0][1] != None and node[0][1].isWin() and minmaxlist[depth -1] == "Max":
+            return [node[0][1], 100000000000]
+
+        elif depth == 1:
+            return [node[0][1], node[0][1].getScore()]
+        elif minmaxlist[depth - 1] == "Min":
+            minScore = 10000000000000
+            minList = []
+            minNode = None
+            for i in node[1]:
+                minList.append(self.miniMax(i, depth - 1))
+            for i in minList:
+                if i[0] != None and i[0].isLose():
+                    minNode = i[0]
+                    minScore = 100000000000
+                    break
+                elif i[0] == []:
+                    pass
+                elif i[1] < minScore:
+                    minScore = i[1]
+                    minNode = i[0]
+
+            if minScore == 100000000000:
+                minScore = -100000000000
+
+
+            return [minNode, minScore]
+        elif minmaxlist[depth - 1] == "Max":
+            maxScore = -10000000000000
+            maxList = []
+            maxNode = None
+            for i in node[1]:
+                maxList.append(self.miniMax(i, depth - 1))
+
+            for i in maxList:
+                if i[0] != None and i[0].isLose():
+                    maxNode = i[0]
+                    maxScore = -1000000000000
+                    break
+                elif i[0] == []:
+                    pass
+                elif i[1] > maxScore:
+                    maxScore = i[1]
+                    maxNode = i[0]
+
+            if maxScore == -10000000000000:
+                pass
+
+            return [maxNode, maxScore]
+
         # The autograder has multiple mins in a row for multiple ghosts
+        '''
         numAgents = node[0][1].getNumAgents()
         if node[0][1] != None and node[0][1].isWin():
             return [node[0][1], 1000000]
-        elif depth == 0:
+
+        elif (depth == self.depth) and (self.depth % 2 != 0):
+            minScore = 10000000000000
+            minList = []
+            minNode = None
+            for i in node[1]:
+                minList.append(self.miniMax(i, depth - 1))
+            for i in minList:
+                if i[0] != None and i[0].isLose():
+                    maxNode = i[0]
+                    maxScore = -1000000000
+                    break
+                elif i[0] == []:
+                    pass
+                elif i[1] < minScore:
+                    minScore = i[1]
+                    minNode = i[0]
+
+            if minScore == 10000000000000:
+                pass
+
+            return [minNode, minScore]
+
+        elif depth == 1:
             return [node[0][1], node[0][1].getScore()]
 
         elif depth % numAgents == 0:
@@ -240,7 +316,7 @@ class MinimaxAgent(AdversarialSearchAgent):
                 pass
 
             return [minNode, minScore]
-
+    '''
     def maxMax(self, node, depth):
 
         if node[0][1] != None and node[0][1].isWin():
@@ -271,16 +347,13 @@ class MinimaxAgent(AdversarialSearchAgent):
             return [maxNode, maxScore]
     #############################################
 
-
     def expandNode(self, nodeToBeExanded, depth):
-        depth += 1
+        #depth += 1
         for i in nodeToBeExanded[0][1].getLegalActions():
             nodeToBeExanded[1].append([[i, nodeToBeExanded[0][1].generateSuccessor(0, i)], []])
-
-
-        if depth != self.depth:
+        if depth < (self.depth - 2):
             for i in nodeToBeExanded[1]:
-                self.expandNode(i, depth)
+                self.expandNode(i, depth + 1)
         else:
             return nodeToBeExanded
 
@@ -314,7 +387,7 @@ def betterEvaluationFunction(currentGameState):
 
     "*** YOUR CODE HERE ***"
 
-    isLouisCool = True
+
     util.raiseNotDefined()
 
 
