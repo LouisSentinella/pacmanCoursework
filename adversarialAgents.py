@@ -99,7 +99,7 @@ class AdversarialSearchAgent(Agent):
     is another abstract class.
     """
 
-    def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
+    def __init__(self, evalFn='scoreEvaluationFunction', depth='3'):
         self.index = 0 # Pacman is always agent index 0
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
@@ -163,6 +163,12 @@ class MinimaxAgent(AdversarialSearchAgent):
                     bestMove = i[0][0]
                     bestScore = result[1]
 
+        for i in resultsList:
+            if i[1][1] == bestScore and i[0] != "Stop":
+                bestResultsList.append(i[0])
+
+        if len(bestResultsList) > 1:
+            return random.choice(bestResultsList)
 
         #print(bestMove)
         return bestMove
