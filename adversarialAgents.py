@@ -143,7 +143,7 @@ class MinimaxAgent(AdversarialSearchAgent):
             gameStateList.append([[i, gameState.generateSuccessor(0, i)], []])
 
         for i in gameStateList:
-            i = self.expandNode(i, 0)
+            i = self.expandNode(i, 1)
 
         #print("You did it baby")
 
@@ -190,12 +190,11 @@ class MinimaxAgent(AdversarialSearchAgent):
 
 
     def miniMax(self, node, depth):
-
-        minmaxlist = ["Min", "Min", "Max"] * ((self.depth % 3) + 1)
-        if node[0][1] != None and node[0][1].isWin() and minmaxlist[depth -1] == "Max":
+        minmaxlist = ["Max", "Min", "Min"] * ((self.depth % 3) + 1)
+        if node[0][1] != None and node[0][1].isWin():
             return [node[0][1], 100000000000]
 
-        elif depth == 1:
+        elif depth == 0:
             return [node[0][1], node[0][1].getScore()]
         elif minmaxlist[depth - 1] == "Min":
             minScore = 10000000000000
@@ -351,7 +350,7 @@ class MinimaxAgent(AdversarialSearchAgent):
         #depth += 1
         for i in nodeToBeExanded[0][1].getLegalActions():
             nodeToBeExanded[1].append([[i, nodeToBeExanded[0][1].generateSuccessor(0, i)], []])
-        if depth < (self.depth - 2):
+        if depth < (self.depth):
             for i in nodeToBeExanded[1]:
                 self.expandNode(i, depth + 1)
         else:
