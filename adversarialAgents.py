@@ -99,7 +99,7 @@ class AdversarialSearchAgent(Agent):
     is another abstract class.
     """
 
-    def __init__(self, evalFn='scoreEvaluationFunction', depth='3'):
+    def __init__(self, evalFn='scoreEvaluationFunction', depth='1'):
         self.index = 0 # Pacman is always agent index 0
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
@@ -154,7 +154,7 @@ class MinimaxAgent(AdversarialSearchAgent):
         bestResultsList = []
         numAgents = gameState.getNumAgents()
         for i in gameStateList:
-            result = self.miniMax(i, (self.depth * gameState.getNumAgents())-1)
+            result = self.miniMax(i, (self.depth * numAgents) - 1)
             resultsList.append([i[0][0], result])
             if result[1] > bestScore:
                 if i[0][0] == "Stop":
@@ -170,13 +170,8 @@ class MinimaxAgent(AdversarialSearchAgent):
         if len(bestResultsList) > 1:
             return random.choice(bestResultsList)
 
-        #print(bestMove)
+        # print(bestMove)
         return bestMove
-
-
-
-
-
 
     def miniMax(self, node, depth):
         numAgents = node[0][1].getNumAgents()
@@ -187,7 +182,7 @@ class MinimaxAgent(AdversarialSearchAgent):
 
         if depth == 0:
             return [node[0][1], node[0][1].getScore()]
-        elif minmaxlist[(self.depth * numAgents) - depth - 1] == "Min":
+        elif minmaxlist[(self.depth * numAgents) - 1 - depth] == "Min":
             minScore = 1000000
             minList = []
             minNode = None
@@ -213,8 +208,6 @@ class MinimaxAgent(AdversarialSearchAgent):
                     maxNode = i[0]
 
             return [maxNode, maxScore]
-
-        # The autograder has multiple mins in a row for multiple ghosts
 
     def expandNode(self, nodeToBeExanded, depth, gameState):
         depth += 1
@@ -242,11 +235,91 @@ class AlphaBetaAgent(AdversarialSearchAgent):
         Returns the minimax with alpha-beta pruning action using self.depth and
         self.evaluationFunction
         """
-        # John is a punk
-        # John = cool kid
+
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
-    # Testy cunt
+        gameStateList = []
+
+        for i in (gameState.getLegalActions(0)):
+            gameStateList.append([[i, gameState.generateSuccessor(0, i)], []])
+
+        for i in gameStateList:
+            i = self.expandNode(i, 1, gameState)
+
+        # print("You did it baby")
+
+        # return bestI
+        bestScore = -100000000000000
+        bestMove = ""
+        resultsList = []
+        bestResultsList = []
+        numAgents = gameState.getNumAgents()
+        for i in gameStateList:
+            result = self.miniMax(i, (self.depth * numAgents) - 1)
+            resultsList.append([i[0][0], result])
+            if result[1] > bestScore:
+                if i[0][0] == "Stop":
+                    pass
+                else:
+                    bestMove = i[0][0]
+                    bestScore = result[1]
+
+        for i in resultsList:
+            if i[1][1] == bestScore and i[0] != "Stop":
+                bestResultsList.append(i[0])
+
+        if len(bestResultsList) > 1:
+            return random.choice(bestResultsList)
+
+        # print(bestMove)
+        return bestMove
+
+    def miniMax(self, node, depth):
+        numAgents = node[0][1].getNumAgents()
+        if numAgents == 3:
+            minmaxlist = ["Min", "Min", "Max"] * (((self.depth * numAgents) // numAgents) + 1)
+        elif numAgents == 2:
+            minmaxlist = ["Min", "Max"] * (((self.depth * numAgents) // numAgents) + 1)
+
+        if depth == 0:
+            return [node[0][1], node[0][1].getScore()]
+        elif minmaxlist[(self.depth * numAgents) - 1 - depth] == "Min":
+            minScore = 1000000
+            minList = []
+            minNode = None
+            for i in node[1]:
+                minList.append(self.miniMax(i, depth - 1))
+            for i in minList:
+                if i[1] < minScore:
+                    minScore = i[1]
+                    minNode = i[0]
+            if minNode == None:
+                pass
+            return [minNode, minScore]
+        elif minmaxlist[(self.depth * numAgents) - 1 - depth] == "Max":
+            maxScore = -10000000000000
+            maxList = []
+            maxNode = None
+            for i in node[1]:
+                maxList.append(self.miniMax(i, depth - 1))
+
+            for i in maxList:
+                if i[1] > maxScore:
+                    maxScore = i[1]
+                    maxNode = i[0]
+
+            return [maxNode, maxScore]
+
+    def expandNode(self, nodeToBeExanded, depth, gameState):
+        depth += 1
+        for i in nodeToBeExanded[0][1].getLegalActions():
+            nodeToBeExanded[1].append([[i, nodeToBeExanded[0][1].generateSuccessor(0, i)], []])
+        if nodeToBeExanded[0][1].getLegalActions() == []:
+            nodeToBeExanded[1].append([["Stop", nodeToBeExanded[0][1]], []])
+        if depth < (self.depth * gameState.getNumAgents()):
+            for i in nodeToBeExanded[1]:
+                self.expandNode(i, depth, gameState)
+        else:
+            return nodeToBeExanded
 
 def betterEvaluationFunction(currentGameState):
     """
@@ -257,9 +330,7 @@ def betterEvaluationFunction(currentGameState):
     """
 
     "*** YOUR CODE HERE ***"
-
-
-    util.raiseNotDefined()
+    return currentGameState.getScore()
 
 
 
