@@ -46,7 +46,7 @@ class ReflexAgent(Agent):
         bestScore = max(scores)
         bestIndices = [index for index in range(len(scores))
                        if scores[index] == bestScore]
-        chosenIndex = random.choice(bestIndices) # Pick randomly among the best
+        chosenIndex = random.choice(bestIndices)  # Pick randomly among the best
 
         return legalMoves[chosenIndex]
 
@@ -100,7 +100,7 @@ class AdversarialSearchAgent(Agent):
     """
 
     def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
-        self.index = 0 # Pacman is always agent index 0
+        self.index = 0  # Pacman is always agent index 0
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
 
@@ -247,7 +247,7 @@ class AlphaBetaAgent(AdversarialSearchAgent):
         bestResultsList = []
         numAgents = gameState.getNumAgents()
         for i in gameStateList:
-            result = self.miniMax(i, (self.depth * numAgents) - 1)
+            result = self.alphaBeta(i, (self.depth * numAgents) - 1, -1000000000000, 1000000000000)
             resultsList.append([i[0][0], result])
             if result[1] > bestScore:
                 if i[0][0] == "Stop":
@@ -266,7 +266,8 @@ class AlphaBetaAgent(AdversarialSearchAgent):
         # print(bestMove)
         return bestMove
 
-    def miniMax(self, node, depth):
+    def alphaBeta(self, node, depth, alpha, beta):
+
         numAgents = node[0][1].getNumAgents()
         if numAgents == 3:
             minmaxlist = ["Min", "Min", "Max"] * (((self.depth * numAgents) // numAgents) + 1)
@@ -275,32 +276,36 @@ class AlphaBetaAgent(AdversarialSearchAgent):
 
         if depth == 0:
             return [node[0][1], node[0][1].getScore()]
+
         elif minmaxlist[(self.depth * numAgents) - 1 - depth] == "Min":
-            minScore = 1000000
-            minList = []
             minNode = None
+
             for i in node[1]:
-                minList.append(self.miniMax(i, depth - 1))
-            for i in minList:
-                if i[1] < minScore:
-                    minScore = i[1]
-                    minNode = i[0]
-            if minNode == None:
-                pass
-            return [minNode, minScore]
+
+                tempResult = (self.alphaBeta(i, depth - 1, alpha, beta))
+
+                if tempResult[1] < beta:
+                    beta = tempResult[1]
+                    minNode = tempResult[0]
+
+                if beta <= alpha:
+                    return [minNode, beta]
+
+            return [minNode, beta]
+
         elif minmaxlist[(self.depth * numAgents) - 1 - depth] == "Max":
-            maxScore = -10000000000000
-            maxList = []
             maxNode = None
             for i in node[1]:
-                maxList.append(self.miniMax(i, depth - 1))
 
-            for i in maxList:
-                if i[1] > maxScore:
-                    maxScore = i[1]
-                    maxNode = i[0]
+                tempResult = self.alphaBeta(i, depth - 1, alpha, beta)
+                if tempResult[1] > alpha:
+                    alpha = tempResult[1]
+                    maxNode = tempResult[0]
 
-            return [maxNode, maxScore]
+                if alpha >= beta:
+                    return [maxNode, alpha]
+
+            return [maxNode, alpha]
 
     def expandNode(self, nodeToBeExanded, depth, gameState, agent):
         if agent > (gameState.getNumAgents() - 1):
@@ -308,7 +313,7 @@ class AlphaBetaAgent(AdversarialSearchAgent):
         depth += 1
         for i in nodeToBeExanded[0][1].getLegalActions(agent):
             nodeToBeExanded[1].append([[i, nodeToBeExanded[0][1].generateSuccessor(agent, i)], []])
-        if nodeToBeExanded[0][1].getLegalActions(agent) == []:
+        if not nodeToBeExanded[0][1].getLegalActions(agent):
             nodeToBeExanded[1].append([["Stop", nodeToBeExanded[0][1]], []])
         if depth < (self.depth * gameState.getNumAgents()):
             for i in nodeToBeExanded[1]:
@@ -327,7 +332,3 @@ def betterEvaluationFunction(currentGameState):
 
     "*** YOUR CODE HERE ***"
     return currentGameState.getScore()
-
-
-
-
