@@ -99,7 +99,7 @@ class AdversarialSearchAgent(Agent):
     is another abstract class.
     """
 
-    def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
+    def __init__(self, evalFn='scoreEvaluationFunction', depth='3'):
         self.index = 0  # Pacman is always agent index 0
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
@@ -245,9 +245,11 @@ class AlphaBetaAgent(AdversarialSearchAgent):
         bestMove = ""
         resultsList = []
         bestResultsList = []
+        alpha = -1000000000000
+        beta = 1000000000000
         numAgents = gameState.getNumAgents()
         for i in gameStateList:
-            result = self.alphaBeta(i, (self.depth * numAgents) - 1, -1000000000000, 1000000000000)
+            result = self.alphaBeta(i, (self.depth * numAgents) - 1, alpha, beta)
             resultsList.append([i[0][0], result])
             if result[1] > bestScore:
                 if i[0][0] == "Stop":
@@ -275,20 +277,20 @@ class AlphaBetaAgent(AdversarialSearchAgent):
             minmaxlist = ["Min", "Max"] * (((self.depth * numAgents) // numAgents) + 1)
 
         if depth == 0:
-            return [node[0][1], node[0][1].getScore()]
+            return [node[0][1], self.evaluationFunction(node[0][1])]
 
         elif minmaxlist[(self.depth * numAgents) - 1 - depth] == "Min":
             minNode = None
 
             for i in node[1]:
-
+                print(depth)
                 tempResult = (self.alphaBeta(i, depth - 1, alpha, beta))
 
                 if tempResult[1] < beta:
                     beta = tempResult[1]
                     minNode = tempResult[0]
 
-                if beta <= alpha:
+                if beta < alpha:
                     return [minNode, beta]
 
             return [minNode, beta]
@@ -302,7 +304,7 @@ class AlphaBetaAgent(AdversarialSearchAgent):
                     alpha = tempResult[1]
                     maxNode = tempResult[0]
 
-                if alpha >= beta:
+                if alpha > beta:
                     return [maxNode, alpha]
 
             return [maxNode, alpha]
