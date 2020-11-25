@@ -99,7 +99,7 @@ class AdversarialSearchAgent(Agent):
     is another abstract class.
     """
 
-    def __init__(self, evalFn='scoreEvaluationFunction', depth='3'):
+    def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
         self.index = 0  # Pacman is always agent index 0
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
@@ -245,8 +245,6 @@ class AlphaBetaAgent(AdversarialSearchAgent):
         bestMove = ""
         resultsList = []
         bestResultsList = []
-        #alpha = -1000000000000
-        #beta = 1000000000000
         numAgents = gameState.getNumAgents()
         for i in gameStateList:
             result = self.alphaBeta(i, (self.depth * numAgents) - 1, -1000000000000, 1000000000000)
@@ -272,34 +270,42 @@ class AlphaBetaAgent(AdversarialSearchAgent):
 
         numAgents = node[0][1].getNumAgents()
         if numAgents == 3:
-            minmaxlist = ["Min", "Min", "Max"] * self.depth
+            minmaxlist = ["Min", "Min", "Max"] * (((self.depth * numAgents) // numAgents) + 1)
         elif numAgents == 2:
-            minmaxlist = ["Min", "Max"] * self.depth
+            minmaxlist = ["Min", "Max"] * (((self.depth * numAgents) // numAgents) + 1)
 
         if depth == 0:
-            return [node[0][1], self.evaluationFunction(node[0][1])]
+            return [node[0][1], node[0][1].getScore()]
 
         elif minmaxlist[(self.depth * numAgents) - 1 - depth] == "Min":
             minNode = None
 
             for i in node[1]:
-                tempResult = (self.alphaBeta(i, depth - 1, alpha, beta))
-                pruned = self.prune(tempResult, alpha, beta, "Max", minNode)
-                if pruned[0]:
-                    return [pruned[1], pruned[2]]
 
-            return [pruned[1], pruned[2]]
+                tempResult = (self.alphaBeta(i, depth - 1, alpha, beta))
+
+                if tempResult[1] < beta:
+                    beta = tempResult[1]
+                    minNode = tempResult[0]
+
+                if beta < alpha:
+                    return [minNode, beta]
+
+            return [minNode, beta]
 
         elif minmaxlist[(self.depth * numAgents) - 1 - depth] == "Max":
             maxNode = None
             for i in node[1]:
 
                 tempResult = self.alphaBeta(i, depth - 1, alpha, beta)
-                pruned = self.prune(tempResult, alpha, beta, "Max", maxNode)
-                if pruned[0]:
-                    return [pruned[1], pruned[2]]
+                if tempResult[1] > alpha:
+                    alpha = tempResult[1]
+                    maxNode = tempResult[0]
 
-            return [pruned[1], pruned[2]]
+                if alpha > beta:
+                    return [maxNode, alpha]
+
+            return [maxNode, alpha]
 
     def expandNode(self, nodeToBeExanded, depth, gameState, agent):
         if agent > (gameState.getNumAgents() - 1):
@@ -314,27 +320,6 @@ class AlphaBetaAgent(AdversarialSearchAgent):
                 self.expandNode(i, depth, gameState, agent + 1)
         else:
             return nodeToBeExanded
-
-    def prune(self, tempResult, alpha, beta, minOrMax, node):
-        if minOrMax == "Max":
-            if tempResult[1] > alpha:
-                alpha = tempResult[1]
-                maxNode = tempResult[0]
-
-            if alpha > beta:
-                return [True, node, alpha]
-            else:
-                return [False, node, alpha]
-        elif minOrMax == "Min":
-            if tempResult[1] < beta:
-                beta = tempResult[1]
-                minNode = tempResult[0]
-
-            if beta < alpha:
-                return [True, node, beta]
-            else:
-                return [False, node, beta]
-
 
 
 def betterEvaluationFunction(currentGameState):
