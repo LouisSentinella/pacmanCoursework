@@ -12,7 +12,7 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 #
 # Modified for use at University of Bath.
-
+from math import inf
 
 from util import manhattanDistance
 from game import Directions
@@ -220,7 +220,6 @@ class MinimaxAgent(AdversarialSearchAgent):
         else:
             return nodeToBeExanded
 
-
 class AlphaBetaAgent(AdversarialSearchAgent):
     """
     Your minimax agent with alpha-beta pruning (question 2)
@@ -233,93 +232,48 @@ class AlphaBetaAgent(AdversarialSearchAgent):
         """
 
         "*** YOUR CODE HERE ***"
-        gameStateList = []
 
-        for i in (gameState.getLegalActions(0)):
-            gameStateList.append([[i, gameState.generateSuccessor(0, i)], []])
+        agentNum = 0
+        value, move = self.Max(gameState, float(-inf), float(inf), 0, agentNum)
 
-        for i in gameStateList:
-            i = self.expandNode(i, 1, gameState, 1)
+        return move
 
-        bestScore = -100000000000000
-        bestMove = ""
-        resultsList = []
-        bestResultsList = []
-        numAgents = gameState.getNumAgents()
-        for i in gameStateList:
-            result = self.alphaBeta(i, (self.depth * numAgents) - 1, -1000000000000, 1000000000000)
-            resultsList.append([i[0][0], result])
-            if result[1] > bestScore:
-                if i[0][0] == "Stop":
-                    pass
-                else:
-                    bestMove = i[0][0]
-                    bestScore = result[1]
+    def Max(self, state, alpha, beta, depth, agentNum):
+        move = None
+        if depth == self.depth * state.getNumAgents() or state.isWin() or state.isLose():
+            return self.evaluationFunction(state), None
 
-        for i in resultsList:
-            if i[1][1] == bestScore and i[0] != "Stop":
-                bestResultsList.append(i[0])
+        value = float(-inf)
 
-        if len(bestResultsList) > 1:
-            return random.choice(bestResultsList)
+        for i in state.getLegalActions(0):
+            value2, i2 = self.Min(state.generateSuccessor(0, i), alpha, beta, depth+1, agentNum +1)
 
-        # print(bestMove)
-        return bestMove
+            if value2 > value:
+                value, move = value2, i
+                alpha = max(alpha, value)
+            if value > beta:
+                return value, move
+        return value, move
 
-    def alphaBeta(self, node, depth, alpha, beta):
+    def Min(self, state, alpha, beta, depth, agentNum):
+        move = None
+        if depth == self.depth * state.getNumAgents() or state.isWin() or state.isLose():
+            return self.evaluationFunction(state), None
 
-        numAgents = node[0][1].getNumAgents()
-        if numAgents == 3:
-            minmaxlist = ["Min", "Min", "Max"] * (((self.depth * numAgents) // numAgents) + 1)
-        elif numAgents == 2:
-            minmaxlist = ["Min", "Max"] * (((self.depth * numAgents) // numAgents) + 1)
+        value = float(inf)
 
-        if depth == 0:
-            return [node[0][1], node[0][1].getScore()]
+        for i in state.getLegalActions(agentNum):
+            if agentNum != state.getNumAgents() - 1:
+                value2, i2 = self.Min(state.generateSuccessor(agentNum, i), alpha, beta, depth + 1, agentNum + 1)
+            else:
+                value2, i2 = self.Max(state.generateSuccessor(agentNum, i), alpha, beta, depth + 1, 0)
 
-        elif minmaxlist[(self.depth * numAgents) - 1 - depth] == "Min":
-            minNode = None
-
-            for i in node[1]:
-
-                tempResult = (self.alphaBeta(i, depth - 1, alpha, beta))
-
-                if tempResult[1] < beta:
-                    beta = tempResult[1]
-                    minNode = tempResult[0]
-
-                if beta < alpha:
-                    return [minNode, beta]
-
-            return [minNode, beta]
-
-        elif minmaxlist[(self.depth * numAgents) - 1 - depth] == "Max":
-            maxNode = None
-            for i in node[1]:
-
-                tempResult = self.alphaBeta(i, depth - 1, alpha, beta)
-                if tempResult[1] > alpha:
-                    alpha = tempResult[1]
-                    maxNode = tempResult[0]
-
-                if alpha > beta:
-                    return [maxNode, alpha]
-
-            return [maxNode, alpha]
-
-    def expandNode(self, nodeToBeExanded, depth, gameState, agent):
-        if agent > (gameState.getNumAgents() - 1):
-            agent = 0
-        depth += 1
-        for i in nodeToBeExanded[0][1].getLegalActions(agent):
-            nodeToBeExanded[1].append([[i, nodeToBeExanded[0][1].generateSuccessor(agent, i)], []])
-        if not nodeToBeExanded[0][1].getLegalActions(agent):
-            nodeToBeExanded[1].append([["Stop", nodeToBeExanded[0][1]], []])
-        if depth < (self.depth * gameState.getNumAgents()):
-            for i in nodeToBeExanded[1]:
-                self.expandNode(i, depth, gameState, agent + 1)
-        else:
-            return nodeToBeExanded
+            if value2 < value:
+                value, move = value2, i
+                beta = min(beta, value)
+            if value < alpha:
+                return value, move
+        return value, move
 
 
 def betterEvaluationFunction(currentGameState):
