@@ -99,7 +99,8 @@ class AdversarialSearchAgent(Agent):
     is another abstract class.
     """
 
-    def __init__(self, evalFn='scoreEvaluationFunction', depth='4'):
+    #def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
+    def __init__(self, evalFn='betterEvaluationFunction', depth='2'):
         self.index = 0  # Pacman is always agent index 0
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
@@ -235,7 +236,6 @@ class AlphaBetaAgent(AdversarialSearchAgent):
 
         agentNum = 0
         value, move = self.Max(gameState, float(-inf), float(inf), 0, agentNum)
-
         return move
 
     def Max(self, state, alpha, beta, depth, agentNum):
@@ -289,4 +289,34 @@ def betterEvaluationFunction(currentGameState):
     """
 
     "*** YOUR CODE HERE ***"
-    return currentGameState.getScore()
+    foodGrid = currentGameState.getFood()
+    counter = 0
+    total = 0
+    returnAmount = 0
+
+
+    #print(foodGrid.asList())
+    for i in foodGrid.asList():
+        counter = counter + 1
+        total += manhattanDistance(i, currentGameState.getPacmanPosition())
+    if counter != 0:
+        average = total / counter
+
+        returnAmount = 1 / average
+        returnAmount *= 100
+    print(currentGameState.getCapsules())
+    print(currentGameState.getGhostState(1).scaredTimer)
+
+    if currentGameState.getGhostState(1).scaredTimer == 39:
+        returnAmount += 10000
+    print(returnAmount)
+    #for i in currentGameState.getCapsules():
+     #   if currentGameState.getPacmanPosition() == i:
+      #      print("expanded to here")
+       #     returnAmount += 10000
+    #if currentGameState.getPacmanPosition() in currentGameState.getCapsules():
+
+
+
+
+    return currentGameState.getScore() + returnAmount
