@@ -99,8 +99,8 @@ class AdversarialSearchAgent(Agent):
     is another abstract class.
     """
 
-    #def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
-    def __init__(self, evalFn='betterEvaluationFunction', depth='2'):
+    def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
+    #def __init__(self, evalFn='betterEvaluationFunction', depth='2'):
         self.index = 0  # Pacman is always agent index 0
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
@@ -294,8 +294,6 @@ def betterEvaluationFunction(currentGameState):
     total = 0
     returnAmount = 0
 
-
-    #print(foodGrid.asList())
     for i in foodGrid.asList():
         counter = counter + 1
         total += manhattanDistance(i, currentGameState.getPacmanPosition())
@@ -304,19 +302,9 @@ def betterEvaluationFunction(currentGameState):
 
         returnAmount = 1 / average
         returnAmount *= 100
-    print(currentGameState.getCapsules())
-    print(currentGameState.getGhostState(1).scaredTimer)
 
-    if currentGameState.getGhostState(1).scaredTimer == 39:
-        returnAmount += 10000
-    print(returnAmount)
-    #for i in currentGameState.getCapsules():
-     #   if currentGameState.getPacmanPosition() == i:
-      #      print("expanded to here")
-       #     returnAmount += 10000
-    #if currentGameState.getPacmanPosition() in currentGameState.getCapsules():
+    if currentGameState.getGhostState(1).scaredTimer == 38:
+        returnAmount += 100
 
 
-
-
-    return currentGameState.getScore() + returnAmount
+    return  returnAmount + currentGameState.getScore()
