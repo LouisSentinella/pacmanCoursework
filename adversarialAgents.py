@@ -99,7 +99,7 @@ class AdversarialSearchAgent(Agent):
     is another abstract class.
     """
 
-    def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
+    def __init__(self, evalFn='scoreEvaluationFunction', depth='4'):
         self.index = 0  # Pacman is always agent index 0
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
@@ -246,13 +246,15 @@ class AlphaBetaAgent(AdversarialSearchAgent):
         value = float(-inf)
 
         for i in state.getLegalActions(0):
-            value2, i2 = self.Min(state.generateSuccessor(0, i), alpha, beta, depth+1, agentNum +1)
+            if i != "Stop":
+            #if True:
+                value2, i2 = self.Min(state.generateSuccessor(0, i), alpha, beta, depth+1, agentNum +1)
 
-            if value2 > value:
-                value, move = value2, i
-                alpha = max(alpha, value)
-            if value > beta:
-                return value, move
+                if value2 > value:
+                    value, move = value2, i
+                    alpha = max(alpha, value)
+                if value > beta:
+                    return value, move
         return value, move
 
     def Min(self, state, alpha, beta, depth, agentNum):
@@ -263,16 +265,18 @@ class AlphaBetaAgent(AdversarialSearchAgent):
         value = float(inf)
 
         for i in state.getLegalActions(agentNum):
-            if agentNum != state.getNumAgents() - 1:
-                value2, i2 = self.Min(state.generateSuccessor(agentNum, i), alpha, beta, depth + 1, agentNum + 1)
-            else:
-                value2, i2 = self.Max(state.generateSuccessor(agentNum, i), alpha, beta, depth + 1, 0)
+            if i != "Stop":
+            #if True:
+                if agentNum != state.getNumAgents() - 1:
+                    value2, i2 = self.Min(state.generateSuccessor(agentNum, i), alpha, beta, depth + 1, agentNum + 1)
+                else:
+                    value2, i2 = self.Max(state.generateSuccessor(agentNum, i), alpha, beta, depth + 1, 0)
 
-            if value2 < value:
-                value, move = value2, i
-                beta = min(beta, value)
-            if value < alpha:
-                return value, move
+                if value2 < value:
+                    value, move = value2, i
+                    beta = min(beta, value)
+                if value < alpha:
+                    return value, move
         return value, move
 
 
