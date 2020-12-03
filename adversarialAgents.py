@@ -100,7 +100,6 @@ class AdversarialSearchAgent(Agent):
     """
 
     def __init__(self, evalFn='scoreEvaluationFunction', depth='2'):
-    #def __init__(self, evalFn='betterEvaluationFunction', depth='2'):
         self.index = 0  # Pacman is always agent index 0
         self.evaluationFunction = util.lookup(evalFn, globals())
         self.depth = int(depth)
@@ -140,10 +139,12 @@ class MinimaxAgent(AdversarialSearchAgent):
 
         gameStateList = []
 
+        # Generates the first nodes for minimax
         for i in (gameState.getLegalActions(0)):
             gameStateList.append([[i, gameState.generateSuccessor(0, i)], []])
 
         for i in gameStateList:
+            # Generates all of the nodes for the minimax function
             i = self.expandNode(i, 1, gameState, 1)
 
         bestScore = -100000000000000
@@ -168,9 +169,10 @@ class MinimaxAgent(AdversarialSearchAgent):
         if len(bestResultsList) > 1:
             return random.choice(bestResultsList)
 
-        # print(bestMove)
         return bestMove
 
+    # Recursively checks the values given by the evaluation function on each node, returning the appropriate node
+    # depending on whether it is max or min
     def miniMax(self, node, depth):
         numAgents = node[0][1].getNumAgents()
         if numAgents == 3:
@@ -207,19 +209,20 @@ class MinimaxAgent(AdversarialSearchAgent):
 
             return [maxNode, maxScore]
 
-    def expandNode(self, nodeToBeExanded, depth, gameState, agent):
+    # Recursively expands all of the nodes and places them into a tree to be used in the minimax function
+    def expandNode(self, nodeToBeExpanded, depth, gameState, agent):
         if agent > (gameState.getNumAgents() - 1):
             agent = 0
         depth += 1
-        for i in nodeToBeExanded[0][1].getLegalActions(agent):
-            nodeToBeExanded[1].append([[i, nodeToBeExanded[0][1].generateSuccessor(agent, i)], []])
-        if nodeToBeExanded[0][1].getLegalActions(agent) == []:
-            nodeToBeExanded[1].append([["Stop", nodeToBeExanded[0][1]], []])
+        for i in nodeToBeExpanded[0][1].getLegalActions(agent):
+            nodeToBeExpanded[1].append([[i, nodeToBeExpanded[0][1].generateSuccessor(agent, i)], []])
+        if nodeToBeExpanded[0][1].getLegalActions(agent) == []:
+            nodeToBeExpanded[1].append([["Stop", nodeToBeExpanded[0][1]], []])
         if depth < (self.depth * gameState.getNumAgents()):
-            for i in nodeToBeExanded[1]:
+            for i in nodeToBeExpanded[1]:
                 self.expandNode(i, depth, gameState, agent + 1)
         else:
-            return nodeToBeExanded
+            return nodeToBeExpanded
 
 class AlphaBetaAgent(AdversarialSearchAgent):
     """
@@ -235,9 +238,12 @@ class AlphaBetaAgent(AdversarialSearchAgent):
         "*** YOUR CODE HERE ***"
 
         agentNum = 0
+        # The first move will always be a max, as it is pacman's move
         value, move = self.Max(gameState, float(-inf), float(inf), 0, agentNum)
         return move
 
+    # Expands the next nodes and, if they are terminal states, finds their evaluation values then prunes accordingly
+    # It then returns the node with the highest evaluation value
     def Max(self, state, alpha, beta, depth, agentNum):
         move = None
         if depth == self.depth * state.getNumAgents() or state.isWin() or state.isLose():
@@ -247,7 +253,6 @@ class AlphaBetaAgent(AdversarialSearchAgent):
 
         for i in state.getLegalActions(0):
             if i != "Stop":
-            #if True:
                 value2, i2 = self.Min(state.generateSuccessor(0, i), alpha, beta, depth+1, agentNum +1)
 
                 if value2 > value:
@@ -257,6 +262,8 @@ class AlphaBetaAgent(AdversarialSearchAgent):
                     return value, move
         return value, move
 
+    # Expands the next nodes and, if they are terminal states, finds their evaluation values then prunes accordingly
+    # It then returns the node with the lowest evaluation value
     def Min(self, state, alpha, beta, depth, agentNum):
         move = None
         if depth == self.depth * state.getNumAgents() or state.isWin() or state.isLose():
@@ -266,7 +273,6 @@ class AlphaBetaAgent(AdversarialSearchAgent):
 
         for i in state.getLegalActions(agentNum):
             if i != "Stop":
-            #if True:
                 if agentNum != state.getNumAgents() - 1:
                     value2, i2 = self.Min(state.generateSuccessor(agentNum, i), alpha, beta, depth + 1, agentNum + 1)
                 else:
@@ -285,7 +291,11 @@ def betterEvaluationFunction(currentGameState):
     Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
     evaluation function (question 3).
 
-    DESCRIPTION: <write something here so we know what you did>
+    DESCRIPTION: We used the manhattanDistance function to find the distance of each pellet from pacman's position, and
+                increased the return value if the average distance was lower, encouraging pacman to move towards clusters
+                of pellets. We also added something that made it so, if a capsule was in the immediate vicinity of
+                pacman, the return value would massively increase for that move, meaning pacman would always go for
+                the capsule.
     """
 
     "*** YOUR CODE HERE ***"
