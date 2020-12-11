@@ -147,34 +147,44 @@ class MinimaxAgent(AdversarialSearchAgent):
             # Generates all of the nodes for the minimax function
             i = self.expandNode(i, 1, gameState, 1)
 
+
+        # Initialise values in order to start minimax search
         bestScore = -100000000000000
         bestMove = ""
         resultsList = []
         bestResultsList = []
         numAgents = gameState.getNumAgents()
+        # Loops through the top three choices, and performs minimax on each of them. Chooses best of choices once
+        # minimax is performed because player will always be last and will always choose max
         for i in gameStateList:
             result = self.miniMax(i, (self.depth * numAgents) - 1)
             resultsList.append([i[0][0], result])
             if result[1] > bestScore:
+                # We have disallowed pacman to stop in order to remain true to real pacman, in which the player also
+                # cannot stop.
                 if i[0][0] == "Stop":
                     pass
                 else:
                     bestMove = i[0][0]
                     bestScore = result[1]
-
+        # If there are multiple ones with the same score add them to a list
         for i in resultsList:
             if i[1][1] == bestScore and i[0] != "Stop":
                 bestResultsList.append(i[0])
-
+        # and choose one at random
         if len(bestResultsList) > 1:
             return random.choice(bestResultsList)
 
         return bestMove
 
     # Recursively checks the values given by the evaluation function on each node, returning the appropriate node
-    # depending on whether it is max or min
+    # depending on whether it is max or min we did not realise we could just copy the pseudocode for this part of our
+    # program, so as you can see, it's a bit of a mess. But despite this, from our brief testing, our minimax
+    # algorithm actually outperforms the one that is just a direct copy of the pseudocode with the added benefit that
+    # we developed this ourselves without using the pseudocode.
     def miniMax(self, node, depth):
         numAgents = node[0][1].getNumAgents()
+        # this is how we handle whether its  a min or  a max
         if numAgents == 3:
             minmaxlist = ["Min", "Min", "Max"] * (((self.depth * numAgents) // numAgents) + 1)
         elif numAgents == 2:
@@ -182,6 +192,7 @@ class MinimaxAgent(AdversarialSearchAgent):
 
         if depth == 0:
             return [node[0][1], node[0][1].getScore()]
+        # just typical minimax
         elif minmaxlist[(self.depth * numAgents) - 1 - depth] == "Min":
             minScore = 1000000
             minList = []
